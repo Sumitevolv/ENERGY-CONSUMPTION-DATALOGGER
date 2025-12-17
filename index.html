@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enemy Consumption - Industrial Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --industrial-dark: #0a0e17;
+            --industrial-blue: #1a2b3c;
+            --industrial-light: #2d3e50;
+            --industrial-accent: #00b4d8;
+            --industrial-warning: #ff9e00;
+            --industrial-danger: #ff4d4d;
+            --industrial-success: #4ade80;
+            --industrial-text: #e2e8f0;
+            --industrial-panel: #1e293b;
+            --industrial-border: #334155;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        body {
+            background-color: var(--industrial-dark);
+            color: var(--industrial-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .dashboard-header {
+            background: linear-gradient(to right, var(--industrial-blue), #0f172a);
+            padding: 1.2rem 2rem;
+            border-bottom: 2px solid var(--industrial-accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            color: var(--industrial-accent);
+            font-size: 1.8rem;
+        }
+        
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--industrial-accent), #90e0ef);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--industrial-success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Controls Section */
+        .dashboard-controls {
+            background-color: var(--industrial-panel);
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid var(--industrial-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .control-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .period-selector {
+            display: flex;
+            background-color: var(--industrial-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .period-btn {
+            padding: 0.6rem 1.2rem;
+            background-color: transparent;
+            color: var(--industrial-text);
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .period-btn:hover {
+            background-color: rgba(0, 180, 216, 0.2);
+        }
+        
+        .period-btn.active {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
+            font-weight: 500;
+        }
+        
+        .cost-input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cost-input {
+            background-color: var(--industrial-light);
+            border: 1px solid var(--industrial-border);
+            color: var(--industrial-text);
+            padding: 0.6rem 0.8rem;
+            width: 120px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .currency-symbol {
+            font-weight: bold;
+            color: var(--industrial-accent);
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0093b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--industrial-success);
+            color: var(--industrial-dark);
+        }
+        
+        .btn-success:hover {
+            background-color: #22c55e;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Dashboard Layout */
+        .dashboard-main {
+            display: flex;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            min-height: calc(100vh - 200px);
+        }
+        
+        /* Sidebar - Machine List */
+        .machine-sidebar {
+            width: 280px;
+            background-color: var(--industrial-panel);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-border);
+            padding: 1.2rem;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        
+        .sidebar-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--industrial-accent);
+            border-bottom: 1px solid var(--industrial-border);
+            padding-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .machine-item {
+            background-color: var(--industrial-light);
+            border-radius: 6px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .machine-item:hover {
+            border-color: var(--industrial-accent);
+        }
+        
+        .machine-item.active {
+            border-color: var(--industrial-accent);
+            box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+        }
+        
+        .machine-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .machine-name {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .machine-icon {
+            color: var(--industrial-accent);
+        }
+        
+        .machine-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .machine-status.online {
+            background-color: var(--industrial-success);
+        }
+        
+        .machine-status.offline {
+            background-color: #64748b;
+        }
+        
+        .machine-status.warning {
+            background-color: var(--industrial-warning);
+        }
+        
+        .machine-phases {
+            padding: 0 1rem 1rem 1rem;
+            display: none;
+        }
+        
+        .machine-item.expanded .machine-phases {
+            display: block;
+        }
+        
+        .phase-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .phase-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Main Content Area */
+        .dashboard-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .metric-card {
+            background-color: var(--industrial-panel);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-border);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-title {
+            font-size: 1.2rem;
+            color: var(--industrial-accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            background-color: var(--industrial-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .toggle-btn {
+            padding: 0.4rem 0.8rem;
+            background-color: transparent;
+            color: var(--industrial-text);
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .toggle-btn.active {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
+        }
+        
+        .phase-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .phase-box {
+            background-color: var(--industrial-light);
+            border-radius: 6px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid var(--industrial-border);
+        }
+        
+        .phase-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .phase-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--industrial-text);
+        }
+        
+        .phase-unit {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-left: 0.2rem;
+        }
+        
+        /* Power & Cost Section */
+        .power-cost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .power-factor-container, .energy-container, .cost-container {
+            background-color: var(--industrial-panel);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-border);
+            padding: 1.5rem;
+        }
+        
+        .pf-select {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--industrial-light);
+            border: 1px solid var(--industrial-border);
+            color: var(--industrial-text);
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        
+        .value-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--industrial-accent);
+            margin: 1rem 0;
+        }
+        
+        .rupee-symbol {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.8rem;
+            color: var(--industrial-accent);
+            margin-right: 0.2rem;
+        }
+        
+        .value-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        /* Summary Sidebar */
+        .summary-sidebar {
+            width: 280px;
+            background-color: var(--industrial-panel);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-border);
+            padding: 1.5rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--industrial-border);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .alert-box {
+            background-color: rgba(255, 158, 0, 0.1);
+            border: 1px solid var(--industrial-warning);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .alert-title {
+            color: var(--industrial-warning);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Footer */
+        .dashboard-footer {
+            background-color: var(--industrial-blue);
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--industrial-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .refresh-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .refresh-btn {
+            background-color: var(--industrial-light);
+            color: var(--industrial-text);
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-main {
+                flex-direction: column;
+            }
+            
+            .machine-sidebar, .summary-sidebar {
+                width: 100%;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .dashboard-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .phase-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .power-cost-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-footer {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        /* Animation for value updates */
+        @keyframes highlightUpdate {
+            0% { color: var(--industrial-text); }
+            50% { color: var(--industrial-accent); }
+            100% { color: var(--industrial-text); }
+        }
+        
+        .value-updated {
+            animation: highlightUpdate 1s ease;
+        }
+        
+        /* Rupee Symbol Styling */
+        .rupee-cost {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: var(--industrial-accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-industry"></i>
+            </div>
+            <h1 class="logo-text">ENEMY CONSUMPTION</h1>
+        </div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>SYSTEM ONLINE</span>
+            <span id="current-time">00:00:00</span>
+        </div>
+    </header>
+
+    <!-- Controls -->
+    <section class="dashboard-controls">
+        <div class="control-group">
+            <span class="control-label">PERIOD:</span>
+            <div class="period-selector">
+                <button class="period-btn active" data-period="daily">DAILY</button>
+                <button class="period-btn" data-period="weekly">WEEKLY</button>
+                <button class="period-btn" data-period="monthly">MONTHLY</button>
+                <button class="period-btn" data-period="yearly">YEARLY</button>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <span class="control-label">COST PER UNIT:</span>
+            <div class="cost-input-container">
+                <span class="currency-symbol">₹</span>
+                <input type="number" class="cost-input" id="cost-input" value="8.50" step="0.10" min="0">
+                <span>/kWh</span>
+                <button class="btn btn-primary" id="set-cost-btn">SET</button>
+            </div>
+        </div>
+        
+        <button class="btn btn-success" id="export-btn">
+            <i class="fas fa-file-excel"></i> EXPORT TO EXCEL
+        </button>
+    </section>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-main">
+        <!-- Machine Sidebar -->
+        <aside class="machine-sidebar">
+            <h2 class="sidebar-title">
+                <i class="fas fa-server"></i> MACHINES
+            </h2>
+            <div id="machine-list">
+                <!-- Machines will be populated by JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="dashboard-content">
+            <!-- Current Metrics -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h2 class="metric-title">
+                        <i class="fas fa-bolt"></i> CURRENT (A)
+                    </h2>
+                    <div class="toggle-buttons" id="current-toggle">
+                        <button class="toggle-btn active" data-view="3phase">3Φ VIEW</button>
+                        <button class="toggle-btn" data-view="1phase">1Φ DETAILED</button>
+                    </div>
+                </div>
+                <div class="phase-display" id="current-display">
+                    <!-- Current values populated by JS -->
+                </div>
+            </div>
+
+            <!-- Voltage Metrics -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h2 class="metric-title">
+                        <i class="fas fa-bolt"></i> VOLTAGE (V)
+                    </h2>
+                    <div class="toggle-buttons" id="voltage-toggle">
+                        <button class="toggle-btn active" data-view="3phase">3Φ VIEW</button>
+                        <button class="toggle-btn" data-view="1phase">1Φ DETAILED</button>
+                    </div>
+                </div>
+                <div class="phase-display" id="voltage-display">
+                    <!-- Voltage values populated by JS -->
+                </div>
+            </div>
+
+            <!-- Power & Energy -->
+            <div class="power-cost-grid">
+                <div class="power-factor-container">
+                    <h2 class="metric-title">
+                        <i class="fas fa-power-off"></i> POWER FACTOR
+                    </h2>
+                    <select class="pf-select" id="pf-select">
+                        <option value="0.85">0.85 - Acceptable</option>
+                        <option value="0.90" selected>0.90 - Good</option>
+                        <option value="0.95">0.95 - Excellent</option>
+                        <option value="0.98">0.98 - Optimal</option>
+                    </select>
+                    <div class="value-display" id="pf-value">0.92</div>
+                    <div class="value-label">Current Power Factor</div>
+                </div>
+
+                <div class="energy-container">
+                    <h2 class="metric-title">
+                        <i class="fas fa-charging-station"></i> ENERGY (kWh)
+                    </h2>
+                    <div class="value-display" id="kwh-machine">1,250.4</div>
+                    <div class="value-label">This Machine (Selected Period)</div>
+                    <div class="value-display" id="kwh-total">3,842.7</div>
+                    <div class="value-label">All Machines Total</div>
+                </div>
+
+                <div class="cost-container">
+                    <h2 class="metric-title">
+                        <i class="fas fa-rupee-sign"></i> COST (₹)
+                    </h2>
+                    <div class="rupee-cost" id="cost-machine">₹ 10,628.40</div>
+                    <div class="value-label">This Machine Cost</div>
+                    <div class="rupee-cost" id="cost-total">₹ 32,662.95</div>
+                    <div class="value-label">Total Cost (All Machines)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Sidebar -->
+        <aside class="summary-sidebar">
+            <h2 class="sidebar-title">
+                <i class="fas fa-chart-bar"></i> OVERVIEW
+            </h2>
+            
+            <div class="summary-item">
+                <span>Total Current:</span>
+                <span id="summary-current">156.3 A</span>
+            </div>
+            <div class="summary-item">
+                <span>Avg Voltage:</span>
+                <span id="summary-voltage">230.8 V</span>
+            </div>
+            <div class="summary-item">
+                <span>Avg Power Factor:</span>
+                <span id="summary-pf">0.89</span>
+            </div>
+            <div class="summary-item">
+                <span>Total kWh:</span>
+                <span id="summary-kwh">3,842.7</span>
+            </div>
+            <div class="summary-item">
+                <span>Total Cost:</span>
+                <span id="summary-cost">₹ 32,662.95</span>
+            </div>
+            
+            <div class="alert-box">
+                <h3 class="alert-title">
+                    <i class="fas fa-exclamation-triangle"></i> ALERTS
+                </h3>
+                <p id="alert-text">2 Machines with PF &lt; 0.85</p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="last-updated">
+            Last Updated: <span id="last-updated-time">--:--:--</span>
+        </div>
+        
+        <div class="refresh-controls">
+            <div class="control-group">
+                <span class="control-label">REFRESH:</span>
+                <select id="refresh-interval">
+                    <option value="5000">5 Seconds</option>
+                    <option value="10000" selected>10 Seconds</option>
+                    <option value="30000">30 Seconds</option>
+                    <option value="60000">1 Minute</option>
+                    <option value="0">Manual</option>
+                </select>
+            </div>
+            <button class="refresh-btn" id="manual-refresh">
+                <i class="fas fa-sync-alt"></i> REFRESH NOW
+            </button>
+        </div>
+        
+        <div class="system-info">
+            <span>Enemy Consumption v1.0 | Industrial Monitoring System</span>
+        </div>
+    </footer>
+
+    <script>
+        // Sample Data with realistic Indian electricity costs (₹8.50/kWh average)
+        const machines = [
+            { id: 1, name: "CNC Machine 01", status: "online", phases: { A: { current: 45.2, voltage: 230.5 }, B: { current: 43.8, voltage: 229.8 }, C: { current: 44.1, voltage: 231.2 } }, pf: 0.92, kwh: 1250.4 },
+            { id: 2, name: "Injection Molder 02", status: "warning", phases: { A: { current: 38.5, voltage: 228.9 }, B: { current: 39.2, voltage: 229.5 }, C: { current: 37.8, voltage: 230.1 } }, pf: 0.82, kwh: 892.3 },
+            { id: 3, name: "Compressor Unit 03", status: "online", phases: { A: { current: 28.7, voltage: 231.8 }, B: { current: 29.3, voltage: 232.1 }, C: { current: 28.9, voltage: 231.5 } }, pf: 0.95, kwh: 756.8 },
+            { id: 4, name: "Assembly Robot 04", status: "online", phases: { A: { current: 22.4, voltage: 230.2 }, B: { current: 21.9, voltage: 229.7 }, C: { current: 22.8, voltage: 230.8 } }, pf: 0.88, kwh: 543.2 },
+            { id: 5, name: "Cooling Tower 05", status: "offline", phases: { A: { current: 0, voltage: 0 }, B: { current: 0, voltage: 0 }, C: { current: 0, voltage: 0 } }, pf: 0, kwh: 400.5 }
+        ];
+
+        let currentMachine = machines[0];
+        let currentPeriod = 'daily';
+        let costPerUnit = 8.50; // ₹8.50 per kWh (Indian average)
+        let refreshInterval;
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            updateTime();
+            setInterval(updateTime, 1000);
+            startAutoRefresh();
+        });
+
+        function initializeDashboard() {
+            renderMachineList();
+            updateMachineDisplay();
+            updateSummary();
+            setupEventListeners();
+        }
+
+        function renderMachineList() {
+            const machineList = document.getElementById('machine-list');
+            machineList.innerHTML = '';
+            
+            machines.forEach(machine => {
+                const machineElement = document.createElement('div');
+                machineElement.className = `machine-item ${machine.id === currentMachine.id ? 'active expanded' : ''}`;
+                machineElement.innerHTML = `
+                    <div class="machine-header" data-id="${machine.id}">
+                        <div class="machine-name">
+                            <i class="fas fa-cog machine-icon"></i>
+                            ${machine.name}
+                        </div>
+                        <div class="machine-status ${machine.status}"></div>
+                    </div>
+                    <div class="machine-phases">
+                        <div class="phase-item">
+                            <span>Phase A</span>
+                            <span>${machine.phases.A.current.toFixed(1)} A / ${machine.phases.A.voltage.toFixed(1)} V</span>
+                        </div>
+                        <div class="phase-item">
+                            <span>Phase B</span>
+                            <span>${machine.phases.B.current.toFixed(1)} A / ${machine.phases.B.voltage.toFixed(1)} V</span>
+                        </div>
+                        <div class="phase-item">
+                            <span>Phase C</span>
+                            <span>${machine.phases.C.current.toFixed(1)} A / ${machine.phases.C.voltage.toFixed(1)} V</span>
+                        </div>
+                    </div>
+                `;
+                machineList.appendChild(machineElement);
+            });
+            
+            // Add click event to machine headers
+            document.querySelectorAll('.machine-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const machineId = parseInt(this.getAttribute('data-id'));
+                    selectMachine(machineId);
+                    
+                    // Toggle expansion
+                    const machineItem = this.parentElement;
+                    const isExpanded = machineItem.classList.contains('expanded');
+                    
+                    // Close all first
+                    document.querySelectorAll('.machine-item').forEach(item => {
+                        item.classList.remove('expanded');
+                    });
+                    
+                    // Open clicked one if it wasn't already expanded
+                    if (!isExpanded) {
+                        machineItem.classList.add('expanded');
+                    }
+                });
+            });
+        }
+
+        function selectMachine(machineId) {
+            // Update active machine
+            document.querySelectorAll('.machine-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const selectedItem = document.querySelector(`.machine-header[data-id="${machineId}"]`).parentElement;
+            selectedItem.classList.add('active');
+            
+            // Find machine data
+            currentMachine = machines.find(m => m.id === machineId);
+            
+            // Update display
+            updateMachineDisplay();
+        }
+
+        function updateMachineDisplay() {
+            // Update current display
+            const currentDisplay = document.getElementById('current-display');
+            currentDisplay.innerHTML = '';
+            
+            ['A', 'B', 'C'].forEach(phase => {
+                const phaseBox = document.createElement('div');
+                phaseBox.className = 'phase-box';
+                phaseBox.innerHTML = `
+                    <div class="phase-label">PHASE ${phase}</div>
+                    <div class="phase-value">${currentMachine.phases[phase].current.toFixed(1)}<span class="phase-unit">A</span></div>
+                `;
+                currentDisplay.appendChild(phaseBox);
+            });
+            
+            // Update voltage display
+            const voltageDisplay = document.getElementById('voltage-display');
+            voltageDisplay.innerHTML = '';
+            
+            ['A', 'B', 'C'].forEach(phase => {
+                const phaseBox = document.createElement('div');
+                phaseBox.className = 'phase-box';
+                phaseBox.innerHTML = `
+                    <div class="phase-label">PHASE ${phase}</div>
+                    <div class="phase-value">${currentMachine.phases[phase].voltage.toFixed(1)}<span class="phase-unit">V</span></div>
+                `;
+                voltageDisplay.appendChild(phaseBox);
+            });
+            
+            // Update power factor
+            document.getElementById('pf-value').textContent = currentMachine.pf.toFixed(2);
+            
+            // Update kWh for selected machine
+            const kwhMachine = calculateKWHForPeriod(currentMachine.kwh, currentPeriod);
+            document.getElementById('kwh-machine').textContent = formatIndianNumber(kwhMachine);
+            
+            // Update cost for selected machine (in Rupees)
+            const costMachine = kwhMachine * costPerUnit;
+            document.getElementById('cost-machine').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(costMachine, true)}`;
+            
+            // Add update animation
+            highlightUpdatedValues();
+        }
+
+        function updateSummary() {
+            // Calculate totals
+            let totalCurrent = 0;
+            let totalVoltage = 0;
+            let totalPF = 0;
+            let totalKWH = 0;
+            let onlineCount = 0;
+            let lowPFCount = 0;
+            
+            machines.forEach(machine => {
+                if (machine.status !== 'offline') {
+                    totalCurrent += machine.phases.A.current + machine.phases.B.current + machine.phases.C.current;
+                    totalVoltage += (machine.phases.A.voltage + machine.phases.B.voltage + machine.phases.C.voltage) / 3;
+                    totalPF += machine.pf;
+                    totalKWH += calculateKWHForPeriod(machine.kwh, currentPeriod);
+                    onlineCount++;
+                    
+                    if (machine.pf < 0.85) {
+                        lowPFCount++;
+                    }
+                }
+            });
+            
+            // Update summary display
+            document.getElementById('summary-current').textContent = `${totalCurrent.toFixed(1)} A`;
+            document.getElementById('summary-voltage').textContent = `${(totalVoltage / onlineCount).toFixed(1)} V`;
+            document.getElementById('summary-pf').textContent = (totalPF / onlineCount).toFixed(2);
+            document.getElementById('summary-kwh').textContent = formatIndianNumber(totalKWH);
+            
+            const totalCost = totalKWH * costPerUnit;
+            document.getElementById('summary-cost').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(totalCost, true)}`;
+            
+            // Update total kWh and cost in main panel
+            document.getElementById('kwh-total').textContent = formatIndianNumber(totalKWH);
+            document.getElementById('cost-total').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(totalCost, true)}`;
+            
+            // Update alerts
+            const alertText = lowPFCount > 0 ? 
+                `${lowPFCount} Machine${lowPFCount > 1 ? 's' : ''} with PF < 0.85` : 
+                'All systems optimal';
+            document.getElementById('alert-text').textContent = alertText;
+        }
+
+        function calculateKWHForPeriod(baseKWH, period) {
+            // Simulate different consumption based on period
+            const multipliers = {
+                daily: baseKWH / 30,
+                weekly: baseKWH / 4.3,
+                monthly: baseKWH,
+                yearly: baseKWH * 12
+            };
+            
+            return baseKWH * (multipliers[period] || 1);
+        }
+
+        // Format numbers in Indian numbering system (lakhs, crores)
+        function formatIndianNumber(num, isCurrency = false) {
+            if (num >= 10000000) { // Crores
+                return (num / 10000000).toFixed(2) + ' Cr';
+            } else if (num >= 100000) { // Lakhs
+                return (num / 100000).toFixed(2) + ' L';
+            } else if (num >= 1000) { // Thousands
+                return num.toLocaleString('en-IN', {
+                    minimumFractionDigits: isCurrency ? 2 : 1,
+                    maximumFractionDigits: isCurrency ? 2 : 1
+                });
+            } else {
+                return num.toLocaleString('en-IN', {
+                    minimumFractionDigits: isCurrency ? 2 : 1,
+                    maximumFractionDigits: isCurrency ? 2 : 1
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            // Period selector
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPeriod = this.getAttribute('data-period');
+                    updateMachineDisplay();
+                    updateSummary();
+                });
+            });
+            
+            // Toggle buttons for current/voltage
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const toggleGroup = this.parentElement;
+                    toggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, this would switch between 3-phase and 1-phase detailed views
+                    const view = this.getAttribute('data-view');
+                    console.log(`Switched to ${view} view`);
+                });
+            });
+            
+            // Power factor selector
+            document.getElementById('pf-select').addEventListener('change', function() {
+                const newPF = parseFloat(this.value);
+                currentMachine.pf = newPF;
+                updateMachineDisplay();
+                updateSummary();
+            });
+            
+            // Cost input
+            document.getElementById('set-cost-btn').addEventListener('click', function() {
+                const newCost = parseFloat(document.getElementById('cost-input').value);
+                if (!isNaN(newCost) && newCost >= 0) {
+                    costPerUnit = newCost;
+                    updateMachineDisplay();
+                    updateSummary();
+                    showNotification('Cost per unit updated successfully');
+                } else {
+                    showNotification('Please enter a valid cost value', 'error');
+                }
+            });
+            
+            // Export button
+            document.getElementById('export-btn').addEventListener('click', exportToExcel);
+            
+            // Manual refresh
+            document.getElementById('manual-refresh').addEventListener('click', manualRefresh);
+            
+            // Refresh interval selector
+            document.getElementById('refresh-interval').addEventListener('change', function() {
+                clearInterval(refreshInterval);
+                const interval = parseInt(this.value);
+                if (interval > 0) {
+                    startAutoRefresh(interval);
+                }
+            });
+        }
+
+        function exportToExcel() {
+            // In a real application, this would generate and download an Excel file
+            // For this demo, we'll show a notification
+            showNotification('Data exported to Excel successfully!', 'success');
+            
+            // Simulate download
+            const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(generateCSVData());
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `enemy-consumption-${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+        }
+
+        function generateCSVData() {
+            let csv = "Machine,Phase A Current (A),Phase B Current (A),Phase C Current (A),Phase A Voltage (V),Phase B Voltage (V),Phase C Voltage (V),Power Factor,kWh,Cost (₹)\n";
+            
+            machines.forEach(machine => {
+                const kwh = calculateKWHForPeriod(machine.kwh, currentPeriod);
+                const cost = kwh * costPerUnit;
+                csv += `${machine.name},${machine.phases.A.current},${machine.phases.B.current},${machine.phases.C.current},${machine.phases.A.voltage},${machine.phases.B.voltage},${machine.phases.C.voltage},${machine.pf},${kwh.toFixed(2)},₹${cost.toFixed(2)}\n`;
+            });
+            
+            return csv;
+        }
+
+        function manualRefresh() {
+            // Simulate data update
+            machines.forEach(machine => {
+                if (machine.status !== 'offline') {
+                    // Add small random variations to simulate real-time data
+                    ['A', 'B', 'C'].forEach(phase => {
+                        machine.phases[phase].current += (Math.random() - 0.5) * 2;
+                        machine.phases[phase].voltage += (Math.random() - 0.5) * 0.5;
+                        
+                        // Ensure values stay in reasonable range
+                        machine.phases[phase].current = Math.max(0, Math.min(100, machine.phases[phase].current));
+                        machine.phases[phase].voltage = Math.max(220, Math.min(240, machine.phases[phase].voltage));
+                    });
+                    
+                    machine.pf += (Math.random() - 0.5) * 0.02;
+                    machine.pf = Math.max(0.8, Math.min(1.0, machine.pf));
+                }
+            });
+            
+            updateMachineDisplay();
+            updateSummary();
+            updateLastUpdatedTime();
+            showNotification('Data refreshed successfully');
+        }
+
+        function startAutoRefresh(interval = 10000) {
+            refreshInterval = setInterval(manualRefresh, interval);
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.toLocaleTimeString('en-US', {hour12: false});
+        }
+
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            document.getElementById('last-updated-time').textContent = 
+                now.toLocaleTimeString('en-US', {hour12: false});
+        }
+
+        function highlightUpdatedValues() {
+            // Add animation class to recently updated values
+            const values = document.querySelectorAll('.phase-value, .value-display, .rupee-cost');
+            values.forEach(value => {
+                value.classList.add('value-updated');
+                setTimeout(() => {
+                    value.classList.remove('value-updated');
+                }, 1000);
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: ${type === 'error' ? '#ff4d4d' : type === 'success' ? '#4ade80' : '#00b4d8'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
