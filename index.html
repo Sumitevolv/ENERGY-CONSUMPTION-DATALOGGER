@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enemy Consumption - Industrial Dashboard</title>
+    <title>Energy Consumption Datalogger - Industrial Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -190,6 +190,16 @@
             transform: translateY(-2px);
         }
         
+        .btn-danger {
+            background-color: var(--industrial-danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff3333;
+            transform: translateY(-2px);
+        }
+        
         /* Main Dashboard Layout */
         .dashboard-main {
             display: flex;
@@ -200,7 +210,7 @@
         
         /* Sidebar - Machine List */
         .machine-sidebar {
-            width: 280px;
+            width: 320px;
             background-color: var(--industrial-panel);
             border-radius: 8px;
             border: 1px solid var(--industrial-border);
@@ -209,15 +219,43 @@
             max-height: 80vh;
         }
         
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        
         .sidebar-title {
             font-size: 1.1rem;
-            margin-bottom: 1.2rem;
             color: var(--industrial-accent);
-            border-bottom: 1px solid var(--industrial-border);
-            padding-bottom: 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        
+        .machine-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .machine-control-btn {
+            background-color: var(--industrial-light);
+            color: var(--industrial-text);
+            border: none;
+            border-radius: 4px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .machine-control-btn:hover {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
         }
         
         .machine-item {
@@ -251,6 +289,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex: 1;
         }
         
         .machine-icon {
@@ -261,6 +300,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
+            margin-right: 0.5rem;
         }
         
         .machine-status.online {
@@ -273,6 +313,30 @@
         
         .machine-status.warning {
             background-color: var(--industrial-warning);
+        }
+        
+        .machine-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+        
+        .machine-action-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        
+        .machine-action-btn:hover {
+            color: var(--industrial-text);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .machine-action-btn.delete:hover {
+            color: var(--industrial-danger);
         }
         
         .machine-phases {
@@ -358,10 +422,177 @@
             color: var(--industrial-dark);
         }
         
-        .phase-display {
+        /* 3Φ View Styles */
+        .phase-display-3phase {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
+        }
+        
+        /* 1Φ Detailed View Styles */
+        .phase-display-1phase {
+            display: none;
+        }
+        
+        .phase-display-1phase.active {
+            display: block;
+        }
+        
+        .phase-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .phase-selector-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: var(--industrial-light);
+            color: var(--industrial-text);
+            border: 1px solid var(--industrial-border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .phase-selector-btn:hover {
+            background-color: rgba(0, 180, 216, 0.2);
+            border-color: var(--industrial-accent);
+        }
+        
+        .phase-selector-btn.active {
+            background-color: var(--industrial-accent);
+            color: var(--industrial-dark);
+            border-color: var(--industrial-accent);
+        }
+        
+        .single-phase-detail {
+            background-color: var(--industrial-light);
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid var(--industrial-border);
+        }
+        
+        .phase-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .phase-title {
+            font-size: 1.5rem;
+            color: var(--industrial-accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .phase-subtitle {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .phase-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .phase-metric {
+            background-color: var(--industrial-blue);
+            border-radius: 6px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid var(--industrial-border);
+        }
+        
+        .phase-metric-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .phase-metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--industrial-text);
+        }
+        
+        .phase-metric-unit {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-left: 0.2rem;
+        }
+        
+        .phase-waveform {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--industrial-blue);
+            border-radius: 6px;
+            border: 1px solid var(--industrial-border);
+        }
+        
+        .waveform-title {
+            font-size: 1rem;
+            color: var(--industrial-accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .waveform-container {
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .waveform {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .waveform-line {
+            fill: none;
+            stroke: var(--industrial-accent);
+            stroke-width: 2;
+        }
+        
+        .waveform-grid {
+            stroke: var(--industrial-border);
+            stroke-width: 0.5;
+            stroke-dasharray: 2,2;
+        }
+        
+        .phase-analysis {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(0, 180, 216, 0.1);
+            border-radius: 4px;
+            border-left: 4px solid var(--industrial-accent);
+        }
+        
+        .analysis-title {
+            font-size: 0.9rem;
+            color: var(--industrial-accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .analysis-content {
+            font-size: 0.9rem;
+            color: #94a3b8;
         }
         
         .phase-box {
@@ -507,6 +738,138 @@
             color: var(--industrial-dark);
         }
         
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background-color: var(--industrial-panel);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-accent);
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--industrial-border);
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            color: var(--industrial-accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--industrial-text);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--industrial-light);
+            border: 1px solid var(--industrial-border);
+            color: var(--industrial-text);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--industrial-accent);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--industrial-border);
+            margin-bottom: 1rem;
+        }
+        
+        /* Confirmation Dialog */
+        .confirmation-dialog {
+            text-align: center;
+        }
+        
+        .confirmation-message {
+            margin: 1.5rem 0;
+            color: var(--industrial-text);
+        }
+        
+        .machine-to-delete {
+            background-color: var(--industrial-light);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--industrial-danger);
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 1200px) {
             .dashboard-main {
@@ -519,6 +882,10 @@
             
             .metrics-grid {
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .phase-metrics-grid {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -539,8 +906,12 @@
                 justify-content: space-between;
             }
             
-            .phase-display {
+            .phase-display-3phase {
                 grid-template-columns: 1fr;
+            }
+            
+            .phase-selector {
+                flex-wrap: wrap;
             }
             
             .power-cost-grid {
@@ -551,6 +922,15 @@
                 flex-direction: column;
                 gap: 1rem;
                 text-align: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 1.5rem;
             }
         }
         
@@ -620,9 +1000,19 @@
     <main class="dashboard-main">
         <!-- Machine Sidebar -->
         <aside class="machine-sidebar">
-            <h2 class="sidebar-title">
-                <i class="fas fa-server"></i> MACHINES
-            </h2>
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">
+                    <i class="fas fa-server"></i> MACHINES <span id="machine-count">(5)</span>
+                </h2>
+                <div class="machine-controls">
+                    <button class="machine-control-btn" id="add-machine-btn" title="Add New Machine">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="machine-control-btn" id="refresh-machines-btn" title="Refresh List">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
             <div id="machine-list">
                 <!-- Machines will be populated by JavaScript -->
             </div>
@@ -641,8 +1031,29 @@
                         <button class="toggle-btn" data-view="1phase">1Φ DETAILED</button>
                     </div>
                 </div>
-                <div class="phase-display" id="current-display">
+                
+                <!-- 3Φ View -->
+                <div class="phase-display-3phase" id="current-3phase">
                     <!-- Current values populated by JS -->
+                </div>
+                
+                <!-- 1Φ Detailed View -->
+                <div class="phase-display-1phase" id="current-1phase">
+                    <div class="phase-selector" id="current-phase-selector">
+                        <button class="phase-selector-btn active" data-phase="A">
+                            <i class="fas fa-bolt"></i> PHASE A
+                        </button>
+                        <button class="phase-selector-btn" data-phase="B">
+                            <i class="fas fa-bolt"></i> PHASE B
+                        </button>
+                        <button class="phase-selector-btn" data-phase="C">
+                            <i class="fas fa-bolt"></i> PHASE C
+                        </button>
+                    </div>
+                    
+                    <div class="single-phase-detail" id="current-phase-detail">
+                        <!-- Will be populated by JS -->
+                    </div>
                 </div>
             </div>
 
@@ -657,8 +1068,29 @@
                         <button class="toggle-btn" data-view="1phase">1Φ DETAILED</button>
                     </div>
                 </div>
-                <div class="phase-display" id="voltage-display">
+                
+                <!-- 3Φ View -->
+                <div class="phase-display-3phase" id="voltage-3phase">
                     <!-- Voltage values populated by JS -->
+                </div>
+                
+                <!-- 1Φ Detailed View -->
+                <div class="phase-display-1phase" id="voltage-1phase">
+                    <div class="phase-selector" id="voltage-phase-selector">
+                        <button class="phase-selector-btn active" data-phase="A">
+                            <i class="fas fa-bolt"></i> PHASE A
+                        </button>
+                        <button class="phase-selector-btn" data-phase="B">
+                            <i class="fas fa-bolt"></i> PHASE B
+                        </button>
+                        <button class="phase-selector-btn" data-phase="C">
+                            <i class="fas fa-bolt"></i> PHASE C
+                        </button>
+                    </div>
+                    
+                    <div class="single-phase-detail" id="voltage-phase-detail">
+                        <!-- Will be populated by JS -->
+                    </div>
                 </div>
             </div>
 
@@ -763,20 +1195,210 @@
         </div>
     </footer>
 
+    <!-- Add Machine Modal -->
+    <div class="modal-overlay" id="add-machine-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-plus-circle"></i> ADD NEW MACHINE
+                </h2>
+                <button class="close-modal" id="close-add-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label">Machine Name</label>
+                    <input type="text" class="form-input" id="machine-name" placeholder="e.g., CNC Machine 06" maxlength="50">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Machine Type</label>
+                    <select class="form-input" id="machine-type">
+                        <option value="cnc">CNC Machine</option>
+                        <option value="molder">Injection Molder</option>
+                        <option value="compressor">Compressor Unit</option>
+                        <option value="robot">Assembly Robot</option>
+                        <option value="cooling">Cooling Tower</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Base Current (A)</label>
+                        <input type="number" class="form-input" id="base-current" value="25" step="0.1" min="0" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Base Voltage (V)</label>
+                        <input type="number" class="form-input" id="base-voltage" value="230" step="0.1" min="220" max="240">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Power Factor</label>
+                        <select class="form-input" id="new-pf">
+                            <option value="0.85">0.85 - Acceptable</option>
+                            <option value="0.90" selected>0.90 - Good</option>
+                            <option value="0.95">0.95 - Excellent</option>
+                            <option value="0.98">0.98 - Optimal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Monthly kWh</label>
+                        <input type="number" class="form-input" id="monthly-kwh" value="500" step="10" min="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Initial Status</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="status" value="online" checked>
+                            <span>Online</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="status" value="offline">
+                            <span>Offline</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="status" value="warning">
+                            <span>Warning</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn" id="cancel-add-machine">CANCEL</button>
+                <button class="btn btn-success" id="save-machine">
+                    <i class="fas fa-save"></i> ADD MACHINE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" style="color: var(--industrial-danger);">
+                    <i class="fas fa-exclamation-triangle"></i> CONFIRM DELETE
+                </h2>
+                <button class="close-modal" id="close-delete-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content confirmation-dialog">
+                <p class="confirmation-message">Are you sure you want to delete this machine?</p>
+                
+                <div class="machine-to-delete" id="machine-to-delete-info">
+                    <!-- Machine info will be populated here -->
+                </div>
+                
+                <p style="color: #94a3b8; font-size: 0.9rem; margin: 1rem 0;">
+                    <i class="fas fa-info-circle"></i> This action cannot be undone. All consumption data for this machine will be lost.
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn" id="cancel-delete">CANCEL</button>
+                <button class="btn btn-danger" id="confirm-delete">
+                    <i class="fas fa-trash"></i> DELETE MACHINE
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Sample Data with realistic Indian electricity costs (₹8.50/kWh average)
-        const machines = [
-            { id: 1, name: "CNC Machine 01", status: "online", phases: { A: { current: 45.2, voltage: 230.5 }, B: { current: 43.8, voltage: 229.8 }, C: { current: 44.1, voltage: 231.2 } }, pf: 0.92, kwh: 1250.4 },
-            { id: 2, name: "Injection Molder 02", status: "warning", phases: { A: { current: 38.5, voltage: 228.9 }, B: { current: 39.2, voltage: 229.5 }, C: { current: 37.8, voltage: 230.1 } }, pf: 0.82, kwh: 892.3 },
-            { id: 3, name: "Compressor Unit 03", status: "online", phases: { A: { current: 28.7, voltage: 231.8 }, B: { current: 29.3, voltage: 232.1 }, C: { current: 28.9, voltage: 231.5 } }, pf: 0.95, kwh: 756.8 },
-            { id: 4, name: "Assembly Robot 04", status: "online", phases: { A: { current: 22.4, voltage: 230.2 }, B: { current: 21.9, voltage: 229.7 }, C: { current: 22.8, voltage: 230.8 } }, pf: 0.88, kwh: 543.2 },
-            { id: 5, name: "Cooling Tower 05", status: "offline", phases: { A: { current: 0, voltage: 0 }, B: { current: 0, voltage: 0 }, C: { current: 0, voltage: 0 } }, pf: 0, kwh: 400.5 }
+        // Machine Database with initial data
+        let machines = [
+            { 
+                id: 1, 
+                name: "CNC Machine 01", 
+                type: "cnc",
+                status: "online", 
+                phases: { 
+                    A: { current: 45.2, voltage: 230.5, power: 10420 }, 
+                    B: { current: 43.8, voltage: 229.8, power: 10065 }, 
+                    C: { current: 44.1, voltage: 231.2, power: 10198 } 
+                }, 
+                pf: 0.92, 
+                kwh: 1250.4 
+            },
+            { 
+                id: 2, 
+                name: "Injection Molder 02", 
+                type: "molder",
+                status: "warning", 
+                phases: { 
+                    A: { current: 38.5, voltage: 228.9, power: 8812 }, 
+                    B: { current: 39.2, voltage: 229.5, power: 8996 }, 
+                    C: { current: 37.8, voltage: 230.1, power: 8698 } 
+                }, 
+                pf: 0.82, 
+                kwh: 892.3 
+            },
+            { 
+                id: 3, 
+                name: "Compressor Unit 03", 
+                type: "compressor",
+                status: "online", 
+                phases: { 
+                    A: { current: 28.7, voltage: 231.8, power: 6651 }, 
+                    B: { current: 29.3, voltage: 232.1, power: 6801 }, 
+                    C: { current: 28.9, voltage: 231.5, power: 6689 } 
+                }, 
+                pf: 0.95, 
+                kwh: 756.8 
+            },
+            { 
+                id: 4, 
+                name: "Assembly Robot 04", 
+                type: "robot",
+                status: "online", 
+                phases: { 
+                    A: { current: 22.4, voltage: 230.2, power: 5157 }, 
+                    B: { current: 21.9, voltage: 229.7, power: 5030 }, 
+                    C: { current: 22.8, voltage: 230.8, power: 5262 } 
+                }, 
+                pf: 0.88, 
+                kwh: 543.2 
+            },
+            { 
+                id: 5, 
+                name: "Cooling Tower 05", 
+                type: "cooling",
+                status: "offline", 
+                phases: { 
+                    A: { current: 0, voltage: 0, power: 0 }, 
+                    B: { current: 0, voltage: 0, power: 0 }, 
+                    C: { current: 0, voltage: 0, power: 0 } 
+                }, 
+                pf: 0, 
+                kwh: 400.5 
+            }
         ];
 
         let currentMachine = machines[0];
         let currentPeriod = 'daily';
-        let costPerUnit = 8.50; // ₹8.50 per kWh (Indian average)
+        let costPerUnit = 8.50;
         let refreshInterval;
+        let machineIdCounter = 5;
+        let machineToDelete = null;
+        let currentView = {
+            current: '3phase',
+            voltage: '3phase',
+            selectedPhase: {
+                current: 'A',
+                voltage: 'A'
+            }
+        };
 
         // Initialize Dashboard
         document.addEventListener('DOMContentLoaded', function() {
@@ -784,6 +1406,9 @@
             updateTime();
             setInterval(updateTime, 1000);
             startAutoRefresh();
+            setupModalListeners();
+            setupViewToggles();
+            setupPhaseSelectors();
         });
 
         function initializeDashboard() {
@@ -791,10 +1416,432 @@
             updateMachineDisplay();
             updateSummary();
             setupEventListeners();
+            updateMachineCount();
+            updateDetailedViews();
+        }
+
+        function setupViewToggles() {
+            // Current toggle
+            document.querySelectorAll('#current-toggle .toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.getAttribute('data-view');
+                    
+                    // Update active button
+                    document.querySelectorAll('#current-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update view
+                    currentView.current = view;
+                    
+                    if (view === '3phase') {
+                        document.getElementById('current-3phase').style.display = 'grid';
+                        document.getElementById('current-1phase').classList.remove('active');
+                    } else {
+                        document.getElementById('current-3phase').style.display = 'none';
+                        document.getElementById('current-1phase').classList.add('active');
+                        updateCurrentDetailedView();
+                    }
+                });
+            });
+            
+            // Voltage toggle
+            document.querySelectorAll('#voltage-toggle .toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.getAttribute('data-view');
+                    
+                    // Update active button
+                    document.querySelectorAll('#voltage-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update view
+                    currentView.voltage = view;
+                    
+                    if (view === '3phase') {
+                        document.getElementById('voltage-3phase').style.display = 'grid';
+                        document.getElementById('voltage-1phase').classList.remove('active');
+                    } else {
+                        document.getElementById('voltage-3phase').style.display = 'none';
+                        document.getElementById('voltage-1phase').classList.add('active');
+                        updateVoltageDetailedView();
+                    }
+                });
+            });
+        }
+
+        function setupPhaseSelectors() {
+            // Current phase selector
+            document.querySelectorAll('#current-phase-selector .phase-selector-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const phase = this.getAttribute('data-phase');
+                    
+                    // Update active button
+                    document.querySelectorAll('#current-phase-selector .phase-selector-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update selected phase
+                    currentView.selectedPhase.current = phase;
+                    
+                    // Update detailed view
+                    updateCurrentDetailedView();
+                });
+            });
+            
+            // Voltage phase selector
+            document.querySelectorAll('#voltage-phase-selector .phase-selector-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const phase = this.getAttribute('data-phase');
+                    
+                    // Update active button
+                    document.querySelectorAll('#voltage-phase-selector .phase-selector-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update selected phase
+                    currentView.selectedPhase.voltage = phase;
+                    
+                    // Update detailed view
+                    updateVoltageDetailedView();
+                });
+            });
+        }
+
+        function updateMachineDisplay() {
+            if (!currentMachine) {
+                if (machines.length > 0) {
+                    currentMachine = machines[0];
+                } else {
+                    // No machines - show empty state
+                    document.getElementById('current-3phase').innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <p>No machine selected</p>
+                        </div>
+                    `;
+                    document.getElementById('voltage-3phase').innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <p>No machine selected</p>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+            
+            // Update 3Φ view for current
+            const current3Phase = document.getElementById('current-3phase');
+            current3Phase.innerHTML = '';
+            
+            ['A', 'B', 'C'].forEach(phase => {
+                const phaseBox = document.createElement('div');
+                phaseBox.className = 'phase-box';
+                phaseBox.innerHTML = `
+                    <div class="phase-label">PHASE ${phase}</div>
+                    <div class="phase-value">${currentMachine.phases[phase].current.toFixed(1)}<span class="phase-unit">A</span></div>
+                `;
+                current3Phase.appendChild(phaseBox);
+            });
+            
+            // Update 3Φ view for voltage
+            const voltage3Phase = document.getElementById('voltage-3phase');
+            voltage3Phase.innerHTML = '';
+            
+            ['A', 'B', 'C'].forEach(phase => {
+                const phaseBox = document.createElement('div');
+                phaseBox.className = 'phase-box';
+                phaseBox.innerHTML = `
+                    <div class="phase-label">PHASE ${phase}</div>
+                    <div class="phase-value">${currentMachine.phases[phase].voltage.toFixed(1)}<span class="phase-unit">V</span></div>
+                `;
+                voltage3Phase.appendChild(phaseBox);
+            });
+            
+            // Update power factor
+            document.getElementById('pf-value').textContent = currentMachine.pf.toFixed(2);
+            document.getElementById('pf-select').value = currentMachine.pf.toFixed(2);
+            
+            // Update kWh for selected machine
+            const kwhMachine = calculateKWHForPeriod(currentMachine.kwh, currentPeriod);
+            document.getElementById('kwh-machine').textContent = formatIndianNumber(kwhMachine);
+            
+            // Update cost for selected machine (in Rupees)
+            const costMachine = kwhMachine * costPerUnit;
+            document.getElementById('cost-machine').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(costMachine, true)}`;
+            
+            // Update detailed views if active
+            if (currentView.current === '1phase') {
+                updateCurrentDetailedView();
+            }
+            if (currentView.voltage === '1phase') {
+                updateVoltageDetailedView();
+            }
+            
+            // Add update animation
+            highlightUpdatedValues();
+        }
+
+        function updateCurrentDetailedView() {
+            if (!currentMachine) return;
+            
+            const phase = currentView.selectedPhase.current;
+            const phaseData = currentMachine.phases[phase];
+            
+            // Calculate additional metrics
+            const apparentPower = phaseData.voltage * phaseData.current; // VA
+            const realPower = apparentPower * currentMachine.pf; // W
+            const reactivePower = Math.sqrt(apparentPower * apparentPower - realPower * realPower); // VAR
+            
+            // Calculate load percentage (assuming max 100A per phase)
+            const loadPercentage = (phaseData.current / 100) * 100;
+            
+            // Create detailed view
+            const detailContainer = document.getElementById('current-phase-detail');
+            detailContainer.innerHTML = `
+                <div class="phase-header">
+                    <h3 class="phase-title">
+                        <i class="fas fa-bolt"></i> PHASE ${phase} - CURRENT ANALYSIS
+                    </h3>
+                    <div class="phase-subtitle">
+                        ${currentMachine.name} | Real-time Monitoring
+                    </div>
+                </div>
+                
+                <div class="phase-metrics-grid">
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Current</div>
+                        <div class="phase-metric-value">${phaseData.current.toFixed(1)}<span class="phase-metric-unit">A</span></div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Load Percentage</div>
+                        <div class="phase-metric-value">${loadPercentage.toFixed(1)}<span class="phase-metric-unit">%</span></div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Real Power</div>
+                        <div class="phase-metric-value">${(realPower/1000).toFixed(2)}<span class="phase-metric-unit">kW</span></div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Apparent Power</div>
+                        <div class="phase-metric-value">${(apparentPower/1000).toFixed(2)}<span class="phase-metric-unit">kVA</span></div>
+                    </div>
+                </div>
+                
+                <div class="phase-waveform">
+                    <div class="waveform-title">
+                        <i class="fas fa-wave-square"></i> CURRENT WAVEFORM - PHASE ${phase}
+                    </div>
+                    <div class="waveform-container" id="current-waveform-${phase}">
+                        <svg class="waveform" viewBox="0 0 300 100">
+                            <defs>
+                                <linearGradient id="waveform-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#00b4d8;stop-opacity:0.7" />
+                                    <stop offset="100%" style="stop-color:#0093b3;stop-opacity:0.9" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Grid lines -->
+                            <path class="waveform-grid" d="M0,25 L300,25 M0,50 L300,50 M0,75 L300,75" />
+                            <!-- Waveform line -->
+                            <path class="waveform-line" d="${generateWaveformPath(phaseData.current, 50)}" 
+                                  stroke="url(#waveform-gradient)" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="phase-analysis">
+                    <div class="analysis-title">
+                        <i class="fas fa-chart-line"></i> PHASE ANALYSIS
+                    </div>
+                    <div class="analysis-content">
+                        <p>Phase ${phase} is operating at <strong>${loadPercentage.toFixed(1)}%</strong> of maximum capacity.</p>
+                        <p>Current stability: <strong>${getStabilityRating(phaseData.current)}</strong></p>
+                        <p>Power quality: <strong>${getPowerQualityRating(phaseData.current, phaseData.voltage)}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateVoltageDetailedView() {
+            if (!currentMachine) return;
+            
+            const phase = currentView.selectedPhase.voltage;
+            const phaseData = currentMachine.phases[phase];
+            
+            // Calculate voltage metrics
+            const voltageDeviation = ((phaseData.voltage - 230) / 230) * 100;
+            const voltageQuality = getVoltageQuality(phaseData.voltage);
+            
+            // Create detailed view
+            const detailContainer = document.getElementById('voltage-phase-detail');
+            detailContainer.innerHTML = `
+                <div class="phase-header">
+                    <h3 class="phase-title">
+                        <i class="fas fa-bolt"></i> PHASE ${phase} - VOLTAGE ANALYSIS
+                    </h3>
+                    <div class="phase-subtitle">
+                        ${currentMachine.name} | Real-time Monitoring
+                    </div>
+                </div>
+                
+                <div class="phase-metrics-grid">
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Voltage</div>
+                        <div class="phase-metric-value">${phaseData.voltage.toFixed(1)}<span class="phase-metric-unit">V</span></div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Deviation</div>
+                        <div class="phase-metric-value">${voltageDeviation.toFixed(2)}<span class="phase-metric-unit">%</span></div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Quality</div>
+                        <div class="phase-metric-value" style="color: ${getVoltageColor(phaseData.voltage)};">
+                            ${voltageQuality}
+                        </div>
+                    </div>
+                    
+                    <div class="phase-metric">
+                        <div class="phase-metric-label">Phase Angle</div>
+                        <div class="phase-metric-value">${getPhaseAngle(phase)}<span class="phase-metric-unit">°</span></div>
+                    </div>
+                </div>
+                
+                <div class="phase-waveform">
+                    <div class="waveform-title">
+                        <i class="fas fa-wave-square"></i> VOLTAGE WAVEFORM - PHASE ${phase}
+                    </div>
+                    <div class="waveform-container" id="voltage-waveform-${phase}">
+                        <svg class="waveform" viewBox="0 0 300 100">
+                            <defs>
+                                <linearGradient id="voltage-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#4ade80;stop-opacity:0.7" />
+                                    <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.9" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Grid lines -->
+                            <path class="waveform-grid" d="M0,25 L300,25 M0,50 L300,50 M0,75 L300,75" />
+                            <!-- Waveform line -->
+                            <path class="waveform-line" d="${generateVoltageWaveformPath(phaseData.voltage, 50)}" 
+                                  stroke="url(#voltage-gradient)" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="phase-analysis">
+                    <div class="analysis-title">
+                        <i class="fas fa-chart-line"></i> VOLTAGE ANALYSIS
+                    </div>
+                    <div class="analysis-content">
+                        <p>Phase ${phase} voltage is <strong>${voltageDeviation > 0 ? 'above' : 'below'}</strong> nominal by <strong>${Math.abs(voltageDeviation).toFixed(2)}%</strong>.</p>
+                        <p>Voltage stability: <strong>${getVoltageStabilityRating(phaseData.voltage)}</strong></p>
+                        <p>Recommended action: <strong>${getVoltageRecommendation(phaseData.voltage)}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateDetailedViews() {
+            updateCurrentDetailedView();
+            updateVoltageDetailedView();
+        }
+
+        // Helper functions for detailed views
+        function generateWaveformPath(currentValue, amplitude) {
+            let path = "M0,50 ";
+            const points = 20;
+            const frequency = currentValue / 10;
+            
+            for (let i = 1; i <= points; i++) {
+                const x = (i / points) * 300;
+                const y = 50 + Math.sin((i / points) * Math.PI * 2 * frequency) * amplitude * (currentValue / 100);
+                path += `L${x},${y} `;
+            }
+            
+            return path;
+        }
+
+        function generateVoltageWaveformPath(voltageValue, amplitude) {
+            let path = "M0,50 ";
+            const points = 20;
+            const frequency = 5; // Fixed frequency for voltage
+            
+            for (let i = 1; i <= points; i++) {
+                const x = (i / points) * 300;
+                const y = 50 + Math.sin((i / points) * Math.PI * 2 * frequency) * amplitude * (voltageValue / 240);
+                path += `L${x},${y} `;
+            }
+            
+            return path;
+        }
+
+        function getStabilityRating(current) {
+            const variation = Math.random() * 5; // Simulate variation
+            if (variation < 1) return "Excellent";
+            if (variation < 2) return "Good";
+            if (variation < 3) return "Fair";
+            return "Needs Attention";
+        }
+
+        function getPowerQualityRating(current, voltage) {
+            const ratio = current / voltage * 1000;
+            if (ratio < 100) return "Excellent";
+            if (ratio < 150) return "Good";
+            if (ratio < 200) return "Fair";
+            return "Poor";
+        }
+
+        function getVoltageQuality(voltage) {
+            if (voltage >= 228 && voltage <= 232) return "Excellent";
+            if (voltage >= 225 && voltage <= 235) return "Good";
+            if (voltage >= 220 && voltage <= 240) return "Acceptable";
+            return "Critical";
+        }
+
+        function getVoltageColor(voltage) {
+            if (voltage >= 228 && voltage <= 232) return "#4ade80";
+            if (voltage >= 225 && voltage <= 235) return "#ff9e00";
+            return "#ff4d4d";
+        }
+
+        function getPhaseAngle(phase) {
+            const angles = { A: 0, B: 120, C: 240 };
+            return angles[phase];
+        }
+
+        function getVoltageStabilityRating(voltage) {
+            const deviation = Math.abs(voltage - 230);
+            if (deviation < 2) return "Excellent";
+            if (deviation < 5) return "Good";
+            if (deviation < 10) return "Fair";
+            return "Unstable";
+        }
+
+        function getVoltageRecommendation(voltage) {
+            if (voltage < 225) return "Check transformer taps";
+            if (voltage > 235) return "Consider voltage regulator";
+            return "Within specifications";
+        }
+
+        function updateMachineCount() {
+            document.getElementById('machine-count').textContent = `(${machines.length})`;
         }
 
         function renderMachineList() {
             const machineList = document.getElementById('machine-list');
+            
+            if (machines.length === 0) {
+                machineList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <p>No machines added yet</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                            Click the <i class="fas fa-plus"></i> button to add a machine
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
             machineList.innerHTML = '';
             
             machines.forEach(machine => {
@@ -803,10 +1850,18 @@
                 machineElement.innerHTML = `
                     <div class="machine-header" data-id="${machine.id}">
                         <div class="machine-name">
+                            <span class="machine-status ${machine.status}"></span>
                             <i class="fas fa-cog machine-icon"></i>
                             ${machine.name}
                         </div>
-                        <div class="machine-status ${machine.status}"></div>
+                        <div class="machine-actions">
+                            <button class="machine-action-btn edit" data-id="${machine.id}" title="Edit Machine">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="machine-action-btn delete" data-id="${machine.id}" title="Delete Machine">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="machine-phases">
                         <div class="phase-item">
@@ -821,6 +1876,14 @@
                             <span>Phase C</span>
                             <span>${machine.phases.C.current.toFixed(1)} A / ${machine.phases.C.voltage.toFixed(1)} V</span>
                         </div>
+                        <div class="phase-item">
+                            <span>Power Factor</span>
+                            <span>${machine.pf.toFixed(2)}</span>
+                        </div>
+                        <div class="phase-item">
+                            <span>Monthly kWh</span>
+                            <span>${machine.kwh.toFixed(1)}</span>
+                        </div>
                     </div>
                 `;
                 machineList.appendChild(machineElement);
@@ -828,89 +1891,74 @@
             
             // Add click event to machine headers
             document.querySelectorAll('.machine-header').forEach(header => {
-                header.addEventListener('click', function() {
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.machine-actions')) {
+                        return;
+                    }
+                    
                     const machineId = parseInt(this.getAttribute('data-id'));
                     selectMachine(machineId);
                     
-                    // Toggle expansion
                     const machineItem = this.parentElement;
                     const isExpanded = machineItem.classList.contains('expanded');
                     
-                    // Close all first
                     document.querySelectorAll('.machine-item').forEach(item => {
                         item.classList.remove('expanded');
                     });
                     
-                    // Open clicked one if it wasn't already expanded
                     if (!isExpanded) {
                         machineItem.classList.add('expanded');
                     }
                 });
             });
+            
+            // Add click events to action buttons
+            document.querySelectorAll('.machine-action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const machineId = parseInt(this.getAttribute('data-id'));
+                    editMachine(machineId);
+                });
+            });
+            
+            document.querySelectorAll('.machine-action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const machineId = parseInt(this.getAttribute('data-id'));
+                    confirmDeleteMachine(machineId);
+                });
+            });
         }
 
         function selectMachine(machineId) {
-            // Update active machine
             document.querySelectorAll('.machine-item').forEach(item => {
                 item.classList.remove('active');
             });
             
             const selectedItem = document.querySelector(`.machine-header[data-id="${machineId}"]`).parentElement;
-            selectedItem.classList.add('active');
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
             
-            // Find machine data
             currentMachine = machines.find(m => m.id === machineId);
             
-            // Update display
             updateMachineDisplay();
-        }
-
-        function updateMachineDisplay() {
-            // Update current display
-            const currentDisplay = document.getElementById('current-display');
-            currentDisplay.innerHTML = '';
-            
-            ['A', 'B', 'C'].forEach(phase => {
-                const phaseBox = document.createElement('div');
-                phaseBox.className = 'phase-box';
-                phaseBox.innerHTML = `
-                    <div class="phase-label">PHASE ${phase}</div>
-                    <div class="phase-value">${currentMachine.phases[phase].current.toFixed(1)}<span class="phase-unit">A</span></div>
-                `;
-                currentDisplay.appendChild(phaseBox);
-            });
-            
-            // Update voltage display
-            const voltageDisplay = document.getElementById('voltage-display');
-            voltageDisplay.innerHTML = '';
-            
-            ['A', 'B', 'C'].forEach(phase => {
-                const phaseBox = document.createElement('div');
-                phaseBox.className = 'phase-box';
-                phaseBox.innerHTML = `
-                    <div class="phase-label">PHASE ${phase}</div>
-                    <div class="phase-value">${currentMachine.phases[phase].voltage.toFixed(1)}<span class="phase-unit">V</span></div>
-                `;
-                voltageDisplay.appendChild(phaseBox);
-            });
-            
-            // Update power factor
-            document.getElementById('pf-value').textContent = currentMachine.pf.toFixed(2);
-            
-            // Update kWh for selected machine
-            const kwhMachine = calculateKWHForPeriod(currentMachine.kwh, currentPeriod);
-            document.getElementById('kwh-machine').textContent = formatIndianNumber(kwhMachine);
-            
-            // Update cost for selected machine (in Rupees)
-            const costMachine = kwhMachine * costPerUnit;
-            document.getElementById('cost-machine').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(costMachine, true)}`;
-            
-            // Add update animation
-            highlightUpdatedValues();
+            updateDetailedViews();
         }
 
         function updateSummary() {
-            // Calculate totals
+            if (machines.length === 0) {
+                document.getElementById('summary-current').textContent = '0 A';
+                document.getElementById('summary-voltage').textContent = '0 V';
+                document.getElementById('summary-pf').textContent = '0';
+                document.getElementById('summary-kwh').textContent = '0';
+                document.getElementById('summary-cost').innerHTML = '<span class="rupee-symbol">₹</span> 0';
+                document.getElementById('kwh-total').textContent = '0';
+                document.getElementById('cost-total').innerHTML = '<span class="rupee-symbol">₹</span> 0';
+                document.getElementById('alert-text').textContent = 'No machines added';
+                return;
+            }
+            
             let totalCurrent = 0;
             let totalVoltage = 0;
             let totalPF = 0;
@@ -932,28 +1980,27 @@
                 }
             });
             
-            // Update summary display
             document.getElementById('summary-current').textContent = `${totalCurrent.toFixed(1)} A`;
-            document.getElementById('summary-voltage').textContent = `${(totalVoltage / onlineCount).toFixed(1)} V`;
-            document.getElementById('summary-pf').textContent = (totalPF / onlineCount).toFixed(2);
+            document.getElementById('summary-voltage').textContent = `${onlineCount > 0 ? (totalVoltage / onlineCount).toFixed(1) : '0'} V`;
+            document.getElementById('summary-pf').textContent = onlineCount > 0 ? (totalPF / onlineCount).toFixed(2) : '0';
             document.getElementById('summary-kwh').textContent = formatIndianNumber(totalKWH);
             
             const totalCost = totalKWH * costPerUnit;
             document.getElementById('summary-cost').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(totalCost, true)}`;
             
-            // Update total kWh and cost in main panel
             document.getElementById('kwh-total').textContent = formatIndianNumber(totalKWH);
             document.getElementById('cost-total').innerHTML = `<span class="rupee-symbol">₹</span> ${formatIndianNumber(totalCost, true)}`;
             
-            // Update alerts
             const alertText = lowPFCount > 0 ? 
                 `${lowPFCount} Machine${lowPFCount > 1 ? 's' : ''} with PF < 0.85` : 
-                'All systems optimal';
+                onlineCount > 0 ? 'All systems optimal' : 'No active machines';
             document.getElementById('alert-text').textContent = alertText;
         }
 
+        // Rest of the functions remain the same (addMachine, deleteMachine, etc.)
+        // ... [Previous functions for add/delete machines remain unchanged] ...
+
         function calculateKWHForPeriod(baseKWH, period) {
-            // Simulate different consumption based on period
             const multipliers = {
                 daily: baseKWH / 30,
                 weekly: baseKWH / 4.3,
@@ -964,17 +2011,11 @@
             return baseKWH * (multipliers[period] || 1);
         }
 
-        // Format numbers in Indian numbering system (lakhs, crores)
         function formatIndianNumber(num, isCurrency = false) {
-            if (num >= 10000000) { // Crores
+            if (num >= 10000000) {
                 return (num / 10000000).toFixed(2) + ' Cr';
-            } else if (num >= 100000) { // Lakhs
+            } else if (num >= 100000) {
                 return (num / 100000).toFixed(2) + ' L';
-            } else if (num >= 1000) { // Thousands
-                return num.toLocaleString('en-IN', {
-                    minimumFractionDigits: isCurrency ? 2 : 1,
-                    maximumFractionDigits: isCurrency ? 2 : 1
-                });
             } else {
                 return num.toLocaleString('en-IN', {
                     minimumFractionDigits: isCurrency ? 2 : 1,
@@ -995,25 +2036,14 @@
                 });
             });
             
-            // Toggle buttons for current/voltage
-            document.querySelectorAll('.toggle-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const toggleGroup = this.parentElement;
-                    toggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // In a real app, this would switch between 3-phase and 1-phase detailed views
-                    const view = this.getAttribute('data-view');
-                    console.log(`Switched to ${view} view`);
-                });
-            });
-            
             // Power factor selector
             document.getElementById('pf-select').addEventListener('change', function() {
                 const newPF = parseFloat(this.value);
-                currentMachine.pf = newPF;
-                updateMachineDisplay();
-                updateSummary();
+                if (currentMachine) {
+                    currentMachine.pf = newPF;
+                    updateMachineDisplay();
+                    updateSummary();
+                }
             });
             
             // Cost input
@@ -1045,12 +2075,222 @@
             });
         }
 
+        function setupModalListeners() {
+            // Add Machine Modal
+            document.getElementById('add-machine-btn').addEventListener('click', openAddMachineModal);
+            document.getElementById('close-add-modal').addEventListener('click', () => {
+                document.getElementById('add-machine-modal').classList.remove('active');
+            });
+            document.getElementById('cancel-add-machine').addEventListener('click', () => {
+                document.getElementById('add-machine-modal').classList.remove('active');
+            });
+            document.getElementById('save-machine').addEventListener('click', addNewMachine);
+            
+            // Delete Confirmation Modal
+            document.getElementById('close-delete-modal').addEventListener('click', () => {
+                document.getElementById('delete-modal').classList.remove('active');
+                machineToDelete = null;
+            });
+            document.getElementById('cancel-delete').addEventListener('click', () => {
+                document.getElementById('delete-modal').classList.remove('active');
+                machineToDelete = null;
+            });
+            document.getElementById('confirm-delete').addEventListener('click', deleteMachine);
+            
+            // Refresh machines button
+            document.getElementById('refresh-machines-btn').addEventListener('click', () => {
+                renderMachineList();
+                showNotification('Machine list refreshed');
+            });
+            
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                        if (overlay.id === 'delete-modal') {
+                            machineToDelete = null;
+                        }
+                    }
+                });
+            });
+            
+            // Enter key to save in add machine modal
+            document.getElementById('machine-name').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addNewMachine();
+                }
+            });
+        }
+
+        function openAddMachineModal() {
+            document.getElementById('machine-name').value = '';
+            document.getElementById('machine-type').value = 'cnc';
+            document.getElementById('base-current').value = '25';
+            document.getElementById('base-voltage').value = '230';
+            document.getElementById('new-pf').value = '0.90';
+            document.getElementById('monthly-kwh').value = '500';
+            document.querySelector('input[name="status"][value="online"]').checked = true;
+            
+            document.getElementById('add-machine-modal').classList.add('active');
+        }
+
+        function addNewMachine() {
+            const name = document.getElementById('machine-name').value.trim();
+            const type = document.getElementById('machine-type').value;
+            const baseCurrent = parseFloat(document.getElementById('base-current').value);
+            const baseVoltage = parseFloat(document.getElementById('base-voltage').value);
+            const pf = parseFloat(document.getElementById('new-pf').value);
+            const monthlyKWH = parseFloat(document.getElementById('monthly-kwh').value);
+            const status = document.querySelector('input[name="status"]:checked').value;
+            
+            if (!name) {
+                showNotification('Please enter a machine name', 'error');
+                return;
+            }
+            
+            if (isNaN(baseCurrent) || baseCurrent < 0 || baseCurrent > 100) {
+                showNotification('Please enter a valid current (0-100A)', 'error');
+                return;
+            }
+            
+            if (isNaN(baseVoltage) || baseVoltage < 220 || baseVoltage > 240) {
+                showNotification('Please enter a valid voltage (220-240V)', 'error');
+                return;
+            }
+            
+            if (isNaN(monthlyKWH) || monthlyKWH < 0) {
+                showNotification('Please enter a valid monthly kWh', 'error');
+                return;
+            }
+            
+            if (machines.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('A machine with this name already exists', 'error');
+                return;
+            }
+            
+            machineIdCounter++;
+            
+            const variationFactor = 0.1;
+            const newMachine = {
+                id: machineIdCounter,
+                name: name,
+                type: type,
+                status: status,
+                phases: {
+                    A: { 
+                        current: baseCurrent * (1 + (Math.random() - 0.5) * variationFactor),
+                        voltage: baseVoltage * (1 + (Math.random() - 0.5) * variationFactor * 0.1),
+                        power: baseCurrent * baseVoltage * pf
+                    },
+                    B: { 
+                        current: baseCurrent * (1 + (Math.random() - 0.5) * variationFactor),
+                        voltage: baseVoltage * (1 + (Math.random() - 0.5) * variationFactor * 0.1),
+                        power: baseCurrent * baseVoltage * pf
+                    },
+                    C: { 
+                        current: baseCurrent * (1 + (Math.random() - 0.5) * variationFactor),
+                        voltage: baseVoltage * (1 + (Math.random() - 0.5) * variationFactor * 0.1),
+                        power: baseCurrent * baseVoltage * pf
+                    }
+                },
+                pf: pf,
+                kwh: monthlyKWH
+            };
+            
+            if (status === 'offline') {
+                newMachine.phases.A.current = 0;
+                newMachine.phases.B.current = 0;
+                newMachine.phases.C.current = 0;
+                newMachine.phases.A.voltage = 0;
+                newMachine.phases.B.voltage = 0;
+                newMachine.phases.C.voltage = 0;
+                newMachine.phases.A.power = 0;
+                newMachine.phases.B.power = 0;
+                newMachine.phases.C.power = 0;
+                newMachine.pf = 0;
+            }
+            
+            machines.push(newMachine);
+            currentMachine = newMachine;
+            
+            renderMachineList();
+            updateMachineDisplay();
+            updateSummary();
+            updateMachineCount();
+            
+            document.getElementById('add-machine-modal').classList.remove('active');
+            showNotification(`Machine "${name}" added successfully`, 'success');
+        }
+
+        function editMachine(machineId) {
+            const machine = machines.find(m => m.id === machineId);
+            if (!machine) return;
+            selectMachine(machineId);
+            showNotification(`Editing ${machine.name}. Use the controls to modify parameters.`, 'info');
+        }
+
+        function confirmDeleteMachine(machineId) {
+            const machine = machines.find(m => m.id === machineId);
+            if (!machine) return;
+            
+            machineToDelete = machine;
+            
+            document.getElementById('machine-to-delete-info').innerHTML = `
+                <strong>${machine.name}</strong><br>
+                <span style="font-size: 0.9rem; color: #94a3b8;">
+                    Type: ${getMachineTypeName(machine.type)}<br>
+                    Status: <span class="machine-status ${machine.status}" style="display: inline-block;"></span> ${machine.status.toUpperCase()}<br>
+                    Monthly Consumption: ${machine.kwh.toFixed(1)} kWh
+                </span>
+            `;
+            
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function deleteMachine() {
+            if (!machineToDelete) return;
+            
+            const index = machines.findIndex(m => m.id === machineToDelete.id);
+            if (index !== -1) {
+                const deletedMachine = machines.splice(index, 1)[0];
+                
+                if (currentMachine && currentMachine.id === deletedMachine.id) {
+                    currentMachine = machines.length > 0 ? machines[0] : null;
+                }
+                
+                renderMachineList();
+                updateMachineDisplay();
+                updateSummary();
+                updateMachineCount();
+                
+                showNotification(`Machine "${deletedMachine.name}" deleted successfully`, 'success');
+            }
+            
+            document.getElementById('delete-modal').classList.remove('active');
+            machineToDelete = null;
+        }
+
+        function getMachineTypeName(type) {
+            const types = {
+                'cnc': 'CNC Machine',
+                'molder': 'Injection Molder',
+                'compressor': 'Compressor Unit',
+                'robot': 'Assembly Robot',
+                'cooling': 'Cooling Tower',
+                'other': 'Other'
+            };
+            return types[type] || 'Unknown';
+        }
+
         function exportToExcel() {
-            // In a real application, this would generate and download an Excel file
-            // For this demo, we'll show a notification
+            if (machines.length === 0) {
+                showNotification('No machines to export', 'error');
+                return;
+            }
+            
             showNotification('Data exported to Excel successfully!', 'success');
             
-            // Simulate download
             const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(generateCSVData());
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -1061,29 +2301,44 @@
         }
 
         function generateCSVData() {
-            let csv = "Machine,Phase A Current (A),Phase B Current (A),Phase C Current (A),Phase A Voltage (V),Phase B Voltage (V),Phase C Voltage (V),Power Factor,kWh,Cost (₹)\n";
+            let csv = "Machine,Type,Status,Phase A Current (A),Phase B Current (A),Phase C Current (A),";
+            csv += "Phase A Voltage (V),Phase B Voltage (V),Phase C Voltage (V),";
+            csv += "Power Factor,Monthly kWh,Period kWh,Cost (₹)\n";
             
             machines.forEach(machine => {
                 const kwh = calculateKWHForPeriod(machine.kwh, currentPeriod);
                 const cost = kwh * costPerUnit;
-                csv += `${machine.name},${machine.phases.A.current},${machine.phases.B.current},${machine.phases.C.current},${machine.phases.A.voltage},${machine.phases.B.voltage},${machine.phases.C.voltage},${machine.pf},${kwh.toFixed(2)},₹${cost.toFixed(2)}\n`;
+                
+                csv += `${machine.name},`;
+                csv += `${getMachineTypeName(machine.type)},`;
+                csv += `${machine.status.toUpperCase()},`;
+                csv += `${machine.phases.A.current.toFixed(1)},`;
+                csv += `${machine.phases.B.current.toFixed(1)},`;
+                csv += `${machine.phases.C.current.toFixed(1)},`;
+                csv += `${machine.phases.A.voltage.toFixed(1)},`;
+                csv += `${machine.phases.B.voltage.toFixed(1)},`;
+                csv += `${machine.phases.C.voltage.toFixed(1)},`;
+                csv += `${machine.pf.toFixed(2)},`;
+                csv += `${machine.kwh.toFixed(2)},`;
+                csv += `${kwh.toFixed(2)},`;
+                csv += `₹${cost.toFixed(2)}\n`;
             });
             
             return csv;
         }
 
         function manualRefresh() {
-            // Simulate data update
             machines.forEach(machine => {
                 if (machine.status !== 'offline') {
-                    // Add small random variations to simulate real-time data
                     ['A', 'B', 'C'].forEach(phase => {
                         machine.phases[phase].current += (Math.random() - 0.5) * 2;
-                        machine.phases[phase].voltage += (Math.random() - 0.5) * 0.5;
-                        
-                        // Ensure values stay in reasonable range
                         machine.phases[phase].current = Math.max(0, Math.min(100, machine.phases[phase].current));
+                        
+                        machine.phases[phase].voltage += (Math.random() - 0.5) * 0.5;
                         machine.phases[phase].voltage = Math.max(220, Math.min(240, machine.phases[phase].voltage));
+                        
+                        // Update power calculation
+                        machine.phases[phase].power = machine.phases[phase].voltage * machine.phases[phase].current * machine.pf;
                     });
                     
                     machine.pf += (Math.random() - 0.5) * 0.02;
@@ -1094,6 +2349,7 @@
             updateMachineDisplay();
             updateSummary();
             updateLastUpdatedTime();
+            updateDetailedViews();
             showNotification('Data refreshed successfully');
         }
 
@@ -1114,8 +2370,7 @@
         }
 
         function highlightUpdatedValues() {
-            // Add animation class to recently updated values
-            const values = document.querySelectorAll('.phase-value, .value-display, .rupee-cost');
+            const values = document.querySelectorAll('.phase-value, .value-display, .rupee-cost, .phase-metric-value');
             values.forEach(value => {
                 value.classList.add('value-updated');
                 setTimeout(() => {
@@ -1125,7 +2380,6 @@
         }
 
         function showNotification(message, type = 'info') {
-            // Create notification element
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
@@ -1144,7 +2398,6 @@
             
             document.body.appendChild(notification);
             
-            // Remove after 3 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
