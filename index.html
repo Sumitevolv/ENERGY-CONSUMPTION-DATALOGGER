@@ -487,6 +487,41 @@ footer{background:var(--charcoal-2); color:#D6D7D8; padding:80px 0 30px;}
   section .wrap, .story-inner{padding-left:20px; padding-right:20px;}
   .flow-row{padding:24px 0; gap:18px 26px;}
 }
+
+/* Responsive Grids */
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+@media (max-width: 760px) {
+  .grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -826,7 +861,7 @@ footer{background:var(--charcoal-2); color:#D6D7D8; padding:80px 0 30px;}
       <div class="why-cell reveal"><b>Local entrepreneurship</b></div>
     </div>
     <div class="eyebrow reveal" style="margin-top: 60px; margin-bottom: 24px;">Operating Model Roles</div>
-    <div class="reveal" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 80px;">
+    <div class="reveal grid-2col" style="margin-bottom: 80px;">
       <div style="background: rgba(255,255,255,0.05); padding: 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
         <h4 style="font-family: var(--font-display); color: var(--orange); font-size: 20px; margin-bottom: 16px; font-weight: 600;">🛡️ EVeez's Support Role</h4>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 14.5px; color: #b7b9ba; padding: 0;">
@@ -911,7 +946,7 @@ footer{background:var(--charcoal-2); color:#D6D7D8; padding:80px 0 30px;}
 <!-- ============ CONTACT / ENQUIRY ============ -->
 <section class="contact-section" id="contact" style="padding: 120px 0; background: var(--offwhite);">
   <div class="wrap">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;">
+    <div class="contact-grid">
       <div>
         <div class="eyebrow reveal">Get in Touch</div>
         <h2 class="reveal" style="font-size: clamp(30px, 4vw, 46px); margin-bottom: 24px;">Let's start a conversation.</h2>
@@ -935,7 +970,7 @@ footer{background:var(--charcoal-2); color:#D6D7D8; padding:80px 0 30px;}
             <option value="general">General Inquiry</option>
           </select>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="input-grid">
           <div>
             <label style="display:block; font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; margin-bottom: 8px;">Name</label>
             <input type="text" placeholder="John Doe" required style="width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--grey-line); outline: none; background: var(--offwhite);" />
